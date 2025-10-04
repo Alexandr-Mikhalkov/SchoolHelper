@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:model="clr-namespace:SchoolHelper"
+             x:DataType="model:MainViewModel"
+             x:Class="SchoolHelper.ContentDisplayPage"
+             Title="{Binding CurrentShoppingList.Name, FallbackValue='Детали списка'}"
+             BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray950}}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <model:IsNullConverter x:Key="IsNullConverter" />
+
+            <Style TargetType="Border" x:Key="CardStyle">
+                <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray700}}" />
+                <Setter Property="StrokeThickness" Value="1" />
+                <Setter Property="Padding" Value="16" />
+                <Setter Property="Margin" Value="16,8,16,0" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}" />
+            </Style>
+
+            <Style TargetType="Entry" x:Key="PriceEntryStyle">
+                <Setter Property="Keyboard" Value="Numeric" />
+                <Setter Property="WidthRequest" Value="80" />
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="VerticalOptions" Value="Center" />
+                <Setter Property="HorizontalTextAlignment" Value="Center" />
+                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}" />
+                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="+" Command="{Binding AddSchoolItemCommand}"/>
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="*, Auto">
+
+        <VerticalStackLayout Spacing="10" IsVisible="{Binding CurrentShoppingList, Converter={StaticResource IsNullConverter}}"
+                             HorizontalOptions="Center" VerticalOptions="Center">
+            <Label Text="¯\_(ツ)_/¯" FontSize="48" HorizontalOptions="Center" />
+            <Label Text="Выберите или создайте список" 
+                   FontSize="18"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"/>
+        </VerticalStackLayout>
+
+
+        <CollectionView Grid.Row="0"
+                        ItemsSource="{Binding CurrentShoppingList.Items}"
+                        SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:Item">
+                    <SwipeView>
+                        <SwipeView.RightItems>
+                            <SwipeItems Mode="Reveal">
+                                <SwipeItemView>
+                                    <Border Style="{StaticResource CardStyle}"
+                                            BackgroundColor="#1E90FF"
+                                            Stroke="{x:Null}" 
+                                            WidthRequest="150"
+                                            Margin="0"
+                                            Padding="12,8"
+                                            StrokeShape="RoundRectangle 12">
+
+                                        <Grid>
+                                            <Label Grid.Column="1"
+                                                   Text="Переименовать"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center"
+                                                   HorizontalTextAlignment="Center"
+                                                   VerticalTextAlignment="Center"
+                                                   FontSize="15"
+                                                   FontAttributes="Bold"/>
+                                        </Grid>
+
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer 
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type model:ContentDisplayPage}}, Path=BindingContext.RenameItemCommand}"
+                                                CommandParameter="{Binding .}"/>
+                                        </Border.GestureRecognizers>
+                                    </Border>
+                                </SwipeItemView>
+
+                                <SwipeItemView>
+                                    <Border Style="{StaticResource CardStyle}"
+                                            BackgroundColor="#DC143C"
+                                            Stroke="{x:Null}"
+                                            WidthRequest="150"
+                                            Margin="0"
+                                            Padding="12,8"
+                                            StrokeShape="RoundRectangle 12">
+
+                                        <Grid>
+                                            <Label Grid.Column="1"
+                                                   Text="Удалить"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center"
+                                                   HorizontalTextAlignment="Center"
+                                                   VerticalTextAlignment="Center"
+                                                   FontSize="15"
+                                                   FontAttributes="Bold"/>
+                                        </Grid>
+
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer 
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type model:ContentDisplayPage}}, Path=BindingContext.DeleteItemCommand}"
+                                                CommandParameter="{Binding .}"/>
+                                        </Border.GestureRecognizers>
+                                    </Border>
+                                </SwipeItemView>
+                            </SwipeItems>
+                        </SwipeView.RightItems>
+
+                        <Border Style="{StaticResource CardStyle}">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                <CheckBox Grid.Column="0" IsChecked="{Binding IsPurchased}" VerticalOptions="Center"
+                                          Color="{StaticResource Primary}"/>
+                                <Label Grid.Column="1" 
+                                       Text="{Binding Name}" 
+                                       FontSize="18" 
+                                       VerticalOptions="Center" 
+                                       FontAttributes="Bold"/>
+                                <Border Grid.Column="2"
+                                        Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 8"
+                                        Padding="8,0"
+                                        WidthRequest="100"
+                                        VerticalOptions="Center"
+                                        BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray800}}">    
+
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="4">
+                                        <Entry Grid.Column="0"
+                                               Placeholder="0"
+                                               Text="{Binding Price}"
+                                               Keyboard="Numeric"
+                                               Style="{StaticResource Gray100}"/>       
+
+                                        <Label Grid.Column="1"
+                                               Text="Br"
+                                               VerticalOptions="Center"
+                                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"/>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </SwipeView>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Border Grid.Row="1" 
+                Padding="16" 
+                Margin="16,8,16,16"
+                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
+                Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray700}}"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 12">
+
+            <Grid ColumnDefinitions="*, Auto">
+                <Label Grid.Column="0" 
+                       Text="Итоговая сумма:"
+                       FontSize="18" 
+                       FontAttributes="Bold"
+                       VerticalOptions="Center"/>
+
+                <Label Grid.Column="1"
+                       FontSize="20" 
+                       FontAttributes="Bold" 
+                       TextColor="{StaticResource Primary}"
+                       VerticalOptions="Center">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="{Binding CurrentShoppingList.TotalCost, StringFormat='{0:C}'}"/>
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+            </Grid>
+        </Border>
+
+    </Grid>
+</ContentPage>
